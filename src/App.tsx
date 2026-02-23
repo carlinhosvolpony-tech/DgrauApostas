@@ -17,7 +17,7 @@ interface Bet {
 }
 
 const MOCK_MATCHES: Match[] = [
-  { id: 1, home: "Flamengo", away: "Fluminense" },
+  { id: 1, home: "Varmengo", away: "Fluminense" },
   { id: 2, home: "São Paulo", away: "Corinthians" },
   { id: 3, home: "Atlético-MG", away: "Cruzeiro" },
   { id: 4, home: "Grêmio", away: "Internacional" },
