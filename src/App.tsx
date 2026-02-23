@@ -17,7 +17,7 @@ interface Bet {
 }
 
 const MOCK_MATCHES: Match[] = [
-  { id: 1, home: "Varmengo", away: "Fluminense" },
+  { id: 1, home: "Flamengo", away: "Fluminense" },
   { id: 2, home: "São Paulo", away: "Corinthians" },
   { id: 3, home: "Atlético-MG", away: "Cruzeiro" },
   { id: 4, home: "Grêmio", away: "Internacional" },
@@ -57,13 +57,14 @@ export default function App() {
 
   const handlePaymentConfirm = () => {
     setIsPaying(true);
+    // Simulate a slightly faster and more robust transition
     setTimeout(() => {
       setIsPaying(false);
       setStep('betting');
       setCurrentBetIndex(0);
       setAllBets([]);
       setCurrentBetPredictions({});
-    }, 2000);
+    }, 1500);
   };
 
   const handleNextBet = () => {
@@ -78,6 +79,9 @@ export default function App() {
     if (currentBetIndex + 1 < betOption) {
       setCurrentBetIndex(prev => prev + 1);
       setCurrentBetPredictions({});
+      // Scroll to top of match list when moving to next bet
+      const scrollContainer = document.querySelector('.custom-scrollbar');
+      if (scrollContainer) scrollContainer.scrollTop = 0;
     } else {
       setStep('success');
     }
@@ -284,7 +288,7 @@ export default function App() {
               </div>
 
               {/* Match List */}
-              <div className="px-4 pb-6 space-y-2 max-h-[50vh] overflow-y-auto custom-scrollbar">
+              <div className="px-4 pb-6 space-y-2 max-h-[60vh] md:max-h-[65vh] overflow-y-auto custom-scrollbar">
                 {MOCK_MATCHES.map((match) => (
                   <div key={match.id} className="flex items-center gap-2 group">
                     <div className="flex-1 bg-primary rounded-full py-2 px-4 flex items-center justify-between shadow-lg">
