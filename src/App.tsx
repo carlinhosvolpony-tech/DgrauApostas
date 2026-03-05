@@ -4,10 +4,28 @@ import { motion, AnimatePresence } from 'motion/react';
 
 type Selection = 'C' | 'E' | 'F' | null;
 
+const INITIAL_MATCHES = [
+  "Flamengo x Fluminense",
+  "Palmeiras x São Paulo",
+  "Corinthians x Santos",
+  "Grêmio x Internacional",
+  "Atlético-MG x Cruzeiro",
+  "Real Madrid x Barcelona",
+  "Man City x Liverpool",
+  "Bayern x Dortmund",
+  "PSG x Marseille",
+  "Inter x Milan",
+  "Arsenal x Chelsea",
+  "Napoli x Juventus"
+];
+
 export default function App() {
   const [selections, setSelections] = useState<Selection[]>(new Array(12).fill(null));
+  const [matches, setMatches] = useState<string[]>(INITIAL_MATCHES);
+  const [clientName, setClientName] = useState('');
   const [ticketCode, setTicketCode] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [currentDate] = useState(new Date().toLocaleDateString('pt-BR'));
 
   useEffect(() => {
     generateNewCode();
@@ -28,14 +46,20 @@ export default function App() {
     setSelections(newSelections);
   };
 
-  const isComplete = selections.every((s) => s !== null);
+  const handleMatchChange = (index: number, value: string) => {
+    const newMatches = [...matches];
+    newMatches[index] = value;
+    setMatches(newMatches);
+  };
+
+  const isComplete = selections.every((s) => s !== null) && clientName.trim() !== '';
 
   const sendToWhatsApp = () => {
     if (!isComplete) return;
 
     const phoneNumber = '5598984595785';
-    const selectionsText = selections.map((s, i) => `${i + 1}: ${s}`).join('\n');
-    const message = `*RODADA D'GRAU*\n\nBilhete Validado!\nCódigo da Moto: *${ticketCode}*\n\nPalpites:\n${selectionsText}\n\nPrêmios:\n12 Acertos: R$ 2.000\n11 Acertos: R$ 1.500\n10 Acertos: R$ 1.000`;
+    const selectionsText = selections.map((s, i) => `${matches[i]}: ${s}`).join('\n');
+    const message = `*RODADA D'GRAU*\n\n*Data:* ${currentDate}\n*Cliente:* ${clientName}\n\nBilhete Validado!\nCódigo da Moto: *${ticketCode}*\n\nPalpites:\n${selectionsText}\n\nPrêmios:\n12 Acertos: R$ 2.000\n11 Acertos: R$ 1.500\n10 Acertos: R$ 1.000`;
     
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -68,13 +92,6 @@ export default function App() {
               DIA DE JOGO É<br />DIA DE GANHAR
             </h2>
 
-            <div className="bg-white p-4 rounded-xl inline-block mb-4 shadow-lg">
-              <QrCode className="w-32 h-32 text-black" />
-            </div>
-            <p className="text-sm font-bold uppercase tracking-widest mb-8">
-              ESCANEIE E BAIXE O APP
-            </p>
-
             <p className="text-xl font-bold italic mb-4">
               APOSTE, TORÇA E GANHE!!!
             </p>
@@ -95,18 +112,33 @@ export default function App() {
 
         {/* Right Panel - Game Grid */}
         <div className="md:w-3/5 bg-bokeh p-8 flex flex-col">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
+            <div className="flex justify-center gap-2 mb-4">
+              <div className="bg-neutral-800 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Próxima Rodada - 12 Jogos
+              </div>
+              <div className="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                {currentDate}
+              </div>
+            </div>
+            
             <h3 className="text-4xl font-display uppercase text-neutral-800 mb-2">
               A CADA RODADA UMA NOVA EMOÇÃO
             </h3>
-            <div className="space-y-1">
-              <p className="text-xl font-bold text-neutral-700">ESCOLHA: CASA / EMPATE / FORA</p>
-              <p className="text-lg font-medium text-neutral-600">TORÇA E COMEMORE A CADA ACERTO</p>
+
+            <div className="max-w-xs mx-auto mb-4">
+              <input
+                type="text"
+                placeholder="NOME DO CLIENTE"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value.toUpperCase())}
+                className="w-full bg-white/80 border-2 border-neutral-200 rounded-xl px-4 py-2 text-center font-bold text-neutral-800 focus:border-neutral-800 outline-none transition-all placeholder:text-neutral-300"
+              />
             </div>
           </div>
 
           {/* Prize Table */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-white/80 backdrop-blur p-3 rounded-xl border border-white shadow-sm text-center">
               <p className="text-xs font-bold text-neutral-500 uppercase">12 Acertos</p>
               <p className="text-xl font-display text-emerald-600">R$ 2.000</p>
@@ -122,17 +154,19 @@ export default function App() {
           </div>
 
           {/* Game Selection Table */}
-          <div className="flex-grow bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white overflow-hidden mb-8">
-            <div className="grid grid-cols-[1fr_auto_1fr] bg-neutral-800 text-white font-bold text-sm py-2 px-4">
-              <span>JOGO</span>
+          <div className="flex-grow bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white overflow-hidden mb-6">
+            <div className="grid grid-cols-[1.5fr_auto_1fr] bg-neutral-800 text-white font-bold text-sm py-2 px-4">
+              <span>PARTIDA</span>
               <span className="px-8">PALPITE</span>
-              <span className="text-right">RESULTADO</span>
+              <span className="text-right">SELEÇÃO</span>
             </div>
-            <div className="divide-y divide-neutral-200 max-h-[400px] overflow-y-auto">
+            <div className="divide-y divide-neutral-200 max-h-[400px] overflow-y-auto custom-scrollbar">
               {selections.map((selection, idx) => (
-                <div key={idx} className="grid grid-cols-[1fr_auto_1fr] items-center py-3 px-4 hover:bg-neutral-50 transition-colors">
-                  <span className="font-bold text-neutral-400">#{String(idx + 1).padStart(2, '0')}</span>
-                  <div className="flex gap-2">
+                <div key={idx} className="grid grid-cols-[1.5fr_auto_1fr] items-center py-3 px-4 hover:bg-neutral-50 transition-colors">
+                  <div className="flex flex-col pr-2">
+                    <span className="font-bold text-neutral-800 text-sm leading-tight">{matches[idx]}</span>
+                  </div>
+                  <div className="flex gap-1.5">
                     {(['C', 'E', 'F'] as Selection[]).map((type) => (
                       <button
                         key={type}
