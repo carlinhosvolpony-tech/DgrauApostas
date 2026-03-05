@@ -5,7 +5,7 @@ import BetCard from './components/BetCard';
 import { getPredictionInsights, generateNewRound } from './services/geminiService';
 
 const DEFAULT_MATCHES: Match[] = [
-  { id: '1', homeTeam: 'Vasco', awayTeam: 'Palmeiras', time: '16:00', league: 'Brasileirão Série A' },
+  { id: '1', homeTeam: 'Flamengo', awayTeam: 'Palmeiras', time: '16:00', league: 'Brasileirão Série A' },
   { id: '2', homeTeam: 'São Paulo', awayTeam: 'Corinthians', time: '18:30', league: 'Brasileirão Série A' },
   { id: '3', homeTeam: 'Real Madrid', awayTeam: 'Barcelona', time: '15:45', league: 'La Liga' },
   { id: '4', homeTeam: 'Liverpool', awayTeam: 'Man City', time: '12:30', league: 'Premier League' },
