@@ -4,13 +4,19 @@ import { Match, BetOption, UserBet, PredictionInsight } from './types';
 import BetCard from './components/BetCard';
 import { getPredictionInsights, generateNewRound } from './services/geminiService';
 
-const DEFAULT_MATCHES: Match[] = [
-  { id: '1', homeTeam: 'Flamengo', awayTeam: 'Palmeiras', time: '16:00', league: 'Brasileirão Série A' },
-  { id: '2', homeTeam: 'São Paulo', awayTeam: 'Corinthians', time: '18:30', league: 'Brasileirão Série A' },
-  { id: '3', homeTeam: 'Real Madrid', awayTeam: 'Barcelona', time: '15:45', league: 'La Liga' },
-  { id: '4', homeTeam: 'Liverpool', awayTeam: 'Man City', time: '12:30', league: 'Premier League' },
-  { id: '5', homeTeam: 'Inter', awayTeam: 'Milan', time: '14:45', league: 'Serie A' },
-  { id: '6', homeTeam: 'PSG', awayTeam: 'Marseille', time: '16:00', league: 'Ligue 1' },
+const INITIAL_MATCHES = [
+  "Flamengo x Fluminense",
+  "Palmeiras x São Paulo",
+  "Corinthians x Santos",
+  "Grêmio x Internacional",
+  "Atlético-MG x Cruzeiro",
+  "Real Madrid x Barcelona",
+  "Man City x Liverpool",
+  "Bayern x Dortmund",
+  "PSG x Marseille",
+  "Inter x Milan",
+  "Arsenal x Chelsea",
+  "Napoli x Juventus"
 ];
 
 const App: React.FC = () => {
