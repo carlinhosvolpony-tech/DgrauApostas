@@ -5,18 +5,18 @@ import { motion, AnimatePresence } from 'motion/react';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-   "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco"
+  "Flamengo x Fluminense",
+  "Palmeiras x São Paulo",
+  "Corinthians x Santos",
+  "Grêmio x Internacional",
+  "Atlético-MG x Cruzeiro",
+  "Real Madrid x Barcelona",
+  "Man City x Liverpool",
+  "Bayern x Dortmund",
+  "PSG x Marseille",
+  "Inter x Milan",
+  "Arsenal x Chelsea",
+  "Napoli x Juventus"
 ];
 
 export default function App() {
@@ -59,7 +59,7 @@ export default function App() {
 
     const phoneNumber = '5598984595785';
     const selectionsText = selections.map((s, i) => `${matches[i]}: ${s}`).join('\n');
-    const message = `*RODADA D'GRAU*\n\n*Data:* ${currentDate}\n*Cliente:* ${clientName}\n\nBilhete Validado!\nCódigo da Moto: *${ticketCode}*\n\nPalpites:\n${selectionsText}\n\nPrêmios:\n12 Acertos: R$ 2.000\n11 Acertos: R$ 1.500\n10 Acertos: R$ 1.000`;
+    const message = `*RODADA D'GRAU*\n\n*Data:* ${currentDate}\n*Cliente:* ${clientName}\n\nBilhete Validado!\nCódigo da Moto: *${ticketCode}*\n\nPalpites:\n${selectionsText}\n\nPrêmio:\n12 Acertos: R$ 1.000,00`;
     
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -138,18 +138,10 @@ export default function App() {
           </div>
 
           {/* Prize Table */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-white/80 backdrop-blur p-3 rounded-xl border border-white shadow-sm text-center">
-              <p className="text-xs font-bold text-neutral-500 uppercase">12 Acertos</p>
-              <p className="text-xl font-display text-emerald-600">R$ 2.000</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur p-3 rounded-xl border border-white shadow-sm text-center">
-              <p className="text-xs font-bold text-neutral-500 uppercase">11 Acertos</p>
-              <p className="text-xl font-display text-emerald-600">R$ 1.500</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur p-3 rounded-xl border border-white shadow-sm text-center">
-              <p className="text-xs font-bold text-neutral-500 uppercase">10 Acertos</p>
-              <p className="text-xl font-display text-emerald-600">R$ 1.000</p>
+          <div className="flex justify-center mb-6">
+            <div className="bg-white/80 backdrop-blur p-4 rounded-xl border border-white shadow-sm text-center min-w-[200px]">
+              <p className="text-xs font-bold text-neutral-500 uppercase">Prêmio Máximo</p>
+              <p className="text-2xl font-display text-emerald-600">12 ACERTOS: R$ 1.000,00</p>
             </div>
           </div>
 
