@@ -5,18 +5,18 @@ import { motion, AnimatePresence } from 'motion/react';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Vasco x Fluminense",
-  "Palmeiras x São Paulo",
-  "Corinthians x Santos",
-  "Grêmio x Internacional",
-  "Atlético-MG x Cruzeiro",
-  "Real Madrid x Barcelona",
-  "Man City x Liverpool",
-  "Bayern x Dortmund",
-  "PSG x Marseille",
-  "Inter x Milan",
-  "Arsenal x Chelsea",
-  "Napoli x Juventus"
+  "Internacional x São Paulo",
+  "Botafogo x Mirassol",
+  "Bahia x Athletico PR",
+  "Cruzeiro x Vitoria",
+  "Coritiba x Vasco",
+  "Fluminense x Corinthians",
+  "America MG x Botafogo SP",
+  "Londrina x Goiás",
+  "Atletico GO x Nautico",
+  "Sport x Vila Nova",
+  "Ponte Preta x Ceará",
+  "Criciúma x Athletic"
 ];
 
 export default function App() {
