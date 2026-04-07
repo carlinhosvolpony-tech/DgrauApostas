@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Internacional x São Paulo",
+  "Vasco x São Paulo",
   "Botafogo x Mirassol",
   "Bahia x Athletico PR",
   "Cruzeiro x Vitoria",
