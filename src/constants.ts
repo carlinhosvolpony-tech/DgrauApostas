@@ -1,7 +1,7 @@
 import { Game } from './types';
 
 export const MOCK_GAMES: Game[] = [
-  { id: 1, homeTeam: 'Vasco', awayTeam: 'São Paulo' },
+  { id: 1, homeTeam: 'Vasco', awayTeam: 'Sampaio Correa' },
   { id: 2, homeTeam: 'Botafogo', awayTeam: 'Mirassol' },
   { id: 3, homeTeam: 'Bahia', awayTeam: 'Athletico PR' },
   { id: 4, homeTeam: 'Cruzeiro', awayTeam: 'Vitoria' },
