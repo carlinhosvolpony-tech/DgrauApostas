@@ -1,5 +1,6 @@
 {
-  "name": "Rodada D'Grau",
-  "description": "App de apostas esportivas com sorteio de moto e prêmios por acertos.",
-  "requestFramePermissions": []
+  "name": "D'grau Apostas",
+  "description": "Aplicativo de apostas esportivas D'grau Apostas, permitindo aos usuários palpitar em resultados de jogos e gerar bilhetes digitais.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
 }
