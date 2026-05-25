@@ -9,7 +9,7 @@ const INITIAL_MATCHES = [
   "Palmeiras x São Paulo",
   "Corinthians x Santos",
   "Grêmio x Internacional",
-  "Atlético-MG x Cruzeiro",
+  "Atlético-MG x Vitoria",
   "Real Madrid x Barcelona",
   "Man City x Liverpool",
   "Bayern x Dortmund",
