@@ -5,7 +5,7 @@ import BetCard from './components/BetCard';
 import { getPredictionInsights, generateNewRound } from './services/geminiService';
 
 const INITIAL_MATCHES = [
-  "Sampaio x Moto",
+  "Sampaio x Moto Clube",
   "Remo x Paysadu",
   "Corinthians x Santos",
   "Grêmio x Internacional",
