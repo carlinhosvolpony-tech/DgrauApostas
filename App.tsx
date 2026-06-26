@@ -5,18 +5,18 @@ import BetCard from './components/BetCard';
 import { getPredictionInsights, generateNewRound } from './services/geminiService';
 
 const INITIAL_MATCHES = [
-  "Sampaio x Moto Clube",
-  "Remo x Paysadu",
-  "Corinthians x Santos",
-  "Grêmio x Internacional",
-  "Atlético-MG x Cruzeiro",
-  "Real Madrid x Barcelona",
-  "Man City x Liverpool",
-  "Bayern x Dortmund",
-  "PSG x Marseille",
-  "Inter x Milan",
-  "Arsenal x Chelsea",
-  "Napoli x Juventus"
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco",
+  "Vasco x Vasco"
 ];
 
 const App: React.FC = () => {
