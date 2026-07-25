@@ -5,7 +5,7 @@ import BetCard from './components/BetCard';
 import { getPredictionInsights, generateNewRound } from './services/geminiService';
 
 const INITIAL_MATCHES = [
-  "Vasco x Vasco",
+  "Vasco x Vaso",
   "Vasco x Vasco",
   "Vasco x Vasco",
   "Vasco x Vasco",
