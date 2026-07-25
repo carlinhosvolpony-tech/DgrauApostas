@@ -8,7 +8,7 @@ const INITIAL_MATCHES = [
   "Athletico PR x Interacional",
   "Santos x Chapecoense",
   "Vasco x Mirassol",
-  "Bhaia x Corinthians",
+  "Bahia x Corinthians",
   "Cruzeiro x Botafogo",
   "Bragantino x Coritiba",
   "Flamengo x São Paulo",
