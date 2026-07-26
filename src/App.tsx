@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'motion/react';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Athletico PR x Interacional",
-  "Santos x Chapecoense",
-  "Vasco x Mirassol",
+  "São Bernardo x Ceará",
+  "Londrina x Novorizontino",
+  "Cerro Porteno x Racing",
   "Bahia x Corinthians",
   "Cruzeiro x Botafogo",
   "Bragantino x Coritiba",
