@@ -1,5 +1,8 @@
 {
-  "name": "Remix Rodada D\u0027Grau",
+  "name": "Remix Rodada D'Grau",
   "description": "App de apostas esportivas com sorteio de moto e prêmios por acertos.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

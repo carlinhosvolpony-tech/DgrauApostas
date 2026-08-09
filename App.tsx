@@ -1,377 +1,345 @@
-
 import React, { useState, useEffect } from 'react';
-import { Match, BetOption, UserBet, PredictionInsight } from './types';
-import BetCard from './components/BetCard';
-import { getPredictionInsights, generateNewRound } from './services/geminiService';
+import { Trophy, Send, Bike, Check, Sparkles, Smartphone, Download, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import logoImg from './assets/images/dgrau_logo_1785466160845.jpg';
+import { DownloadAppModal } from './components/DownloadAppModal';
+
+type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Vasco x Vaso",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco",
-  "Vasco x Vasco"
+  "Flamengo x Fluminense",
+  "Palmeiras x São Paulo",
+  "Corinthians x Santos",
+  "Grêmio x Internacional",
+  "Atlético-MG x Cruzeiro",
+  "Real Madrid x Barcelona",
+  "Man City x Liverpool",
+  "Bayern x Dortmund",
+  "PSG x Marseille",
+  "Inter x Milan",
+  "Arsenal x Chelsea",
+  "Napoli x Juventus"
 ];
 
-const App: React.FC = () => {
-  const [matches, setMatches] = useState<Match[]>(DEFAULT_MATCHES);
-  const [roundTitle, setRoundTitle] = useState('RODADA DE HOJE');
-  const [bets, setBets] = useState<UserBet[]>([]);
-  const [insights, setInsights] = useState<PredictionInsight[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showPixModal, setShowPixModal] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [isAdminMode, setIsAdminMode] = useState(false);
-  const [editMatches, setEditMatches] = useState<Match[]>([]);
-  const [editTitle, setEditTitle] = useState('');
-
-  const fetchRoundData = async (newMatches?: Match[]) => {
-    setLoading(true);
-    const targetMatches = newMatches || matches;
-    const data = await getPredictionInsights(targetMatches);
-    setInsights(data);
-    setLoading(false);
-  };
+export default function App() {
+  const [selections, setSelections] = useState<Selection[]>(new Array(12).fill(null));
+  const [matches, setMatches] = useState<string[]>(INITIAL_MATCHES);
+  const [clientName, setClientName] = useState('');
+  const [ticketCode, setTicketCode] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [currentDate] = useState(new Date().toLocaleDateString('pt-BR'));
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
-    fetchRoundData();
+    generateNewCode();
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
-  const handleAdminCheck = () => {
-    if (adminPassword === 'degrauln77') {
-      setIsAdminMode(true);
-      setEditMatches(JSON.parse(JSON.stringify(matches)));
-      setEditTitle(roundTitle);
-      setAdminPassword('');
-    } else {
-      alert("Senha incorreta!");
-    }
-  };
-
-  const saveManualRound = () => {
-    setMatches(editMatches);
-    setRoundTitle(editTitle);
-    setBets([]);
-    setIsAdminMode(false);
-    setShowAdminModal(false);
-    fetchRoundData(editMatches);
-  };
-
-  const handleUpdateMatch = (index: number, field: keyof Match, value: string) => {
-    const updated = [...editMatches];
-    updated[index] = { ...updated[index], [field]: value };
-    setEditMatches(updated);
-  };
-
-  const handleSelect = (matchId: string, choice: BetOption) => {
-    setBets(prev => {
-      const existing = prev.find(b => b.matchId === matchId);
-      if (existing?.choice === choice) {
-        return prev.filter(b => b.matchId !== matchId);
+  const handleInstallPwa = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
       }
-      const otherBets = prev.filter(b => b.matchId !== matchId);
-      return [...otherBets, { matchId, choice }];
-    });
-  };
-
-  const totalCostValue = (bets.length > 0 ? 2.0 : 0.0);
-  const totalCostStr = totalCostValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-  const handleSubmit = () => {
-    if (bets.length < 3) {
-      alert("Selecione pelo menos 3 jogos para validar sua cartela!");
-      return;
+    } else {
+      // Fallback: alert instructions or keep modal active
+      alert('Para instalar o App no seu celular:\n\nAndroid: Clique nos 3 pontinhos do Chrome > "Instalar aplicativo"\niPhone (iOS): Toque em Compartilhar no Safari > "Adicionar à Tela de Início".');
     }
-    setShowPixModal(true);
   };
 
-  const handleWhatsApp = () => {
-    const betDetails = bets.map(b => {
-      const m = matches.find(match => match.id === b.matchId);
-      return `${m?.homeTeam} vs ${m?.awayTeam}: ${b.choice}`;
-    }).join('\n');
+  const generateNewCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setTicketCode(result);
+  };
+
+  const handleSelect = (index: number, value: Selection) => {
+    const newSelections = [...selections];
+    newSelections[index] = value;
+    setSelections(newSelections);
+  };
+
+  const isComplete = selections.every((s) => s !== null) && clientName.trim() !== '';
+
+  const sendToWhatsApp = () => {
+    if (!isComplete) return;
+
+    const phoneNumber = '5598984595785';
+    const selectionsText = selections.map((s, i) => `${matches[i]}: ${s}`).join('\n');
+    const message = `*RODADA D'GRAU*\n\n*Data:* ${currentDate}\n*Cliente:* ${clientName}\n\nBilhete Validado!\nCódigo da Moto: *${ticketCode}*\n\nPalpites:\n${selectionsText}\n\nPrêmio:\n12 Acertos: R$ 1.000,00`;
     
-    const message = encodeURIComponent(
-      `Olá! Gostaria de confirmar minha aposta na Rodada D'Grau.\n\n` +
-      `Meus palpites:\n${betDetails}\n\n` +
-      `Valor total: ${totalCostStr}\n` +
-      `Estou enviando o comprovante do PIX abaixo.`
-    );
-    window.open(`https://wa.me/5598984595785?text=${message}`, '_blank');
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    setShowSuccess(true);
   };
 
   return (
-    <div className="min-h-screen bg-emerald-950 selection:bg-lime-400 selection:text-emerald-950 pb-32">
-      {/* Header */}
-      <header className="bg-emerald-800 border-b-4 border-emerald-900 py-8 px-4 flex flex-col items-center text-center shadow-lg relative">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <div className="w-16 h-16 bg-lime-400 rounded-full flex items-center justify-center shadow-xl">
-            <i className="fas fa-soccer-ball text-4xl text-emerald-900"></i>
+    <div className="min-h-screen flex flex-col items-center justify-center p-3 md:p-6 bg-neutral-950 text-neutral-100 font-sans relative">
+      
+      {/* Top Banner - App Download Action */}
+      <div className="w-full max-w-5xl mb-3 flex items-center justify-between bg-gradient-to-r from-emerald-950 via-neutral-900 to-emerald-950 p-2.5 sm:p-3 rounded-2xl border border-emerald-500/40 shadow-lg backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <img 
+            src={logoImg} 
+            alt="D'Grau Logo Icon" 
+            className="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-lg border border-emerald-500/50 bg-black shrink-0"
+            referrerPolicy="no-referrer"
+          />
+          <div>
+            <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <span>App Rodada D'Grau</span>
+              <span className="bg-emerald-500 text-black text-[10px] font-extrabold px-1.5 py-0.2 rounded uppercase">Oficial</span>
+            </p>
+            <p className="text-[10px] sm:text-xs text-neutral-400 font-medium hidden xs:block">
+              Baixe no seu celular Android ou iPhone
+            </p>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black font-oswald tracking-tighter leading-none text-white">
-            RODADA<br/>D'GRAU
-          </h1>
         </div>
-        <p className="text-lg md:text-xl font-bold tracking-widest text-emerald-200 mt-2 uppercase">
-          DIA DE JOGO É DIA DE GANHAR
-        </p>
 
-        <button 
-          onClick={() => setShowAdminModal(true)}
-          className="absolute top-4 right-4 bg-emerald-700/50 hover:bg-emerald-600 text-[10px] font-bold py-2 px-3 rounded-lg border border-emerald-600 transition-all text-emerald-100 flex items-center gap-2"
+        <button
+          onClick={() => setIsDownloadModalOpen(true)}
+          className="px-3.5 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-display font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md glow-green-sm flex items-center gap-2 transition-all transform active:scale-95 cursor-pointer shrink-0"
         >
-          <i className="fas fa-lock"></i>
-          ADMIN
+          <Smartphone className="w-4 h-4" />
+          <span className="hidden sm:inline">Baixar App</span>
+          <span className="sm:hidden">Baixar</span>
         </button>
-      </header>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl md:text-3xl font-oswald uppercase font-bold text-white tracking-tight leading-tight">
-              {roundTitle}
-            </h2>
-            <p className="text-emerald-400 font-medium">ESCOLHA: CASA / EMPATE / FORA</p>
-          </div>
-          <div className="bg-lime-400 text-emerald-950 px-6 py-2 rounded-full font-black text-xl animate-pulse shadow-xl shadow-lime-400/20">
-            SOMENTE R$ 2,00
-          </div>
-        </div>
-
-        {/* AI Insight Loading State */}
-        {loading && (
-          <div className="mb-6 p-4 bg-emerald-900/50 rounded-lg flex items-center gap-3 border border-lime-400/30">
-            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-lime-400"></div>
-            <span className="text-lime-400 text-sm font-bold">Atualizando inteligência da rodada...</span>
-          </div>
-        )}
-
-        {/* Matches List */}
-        <div className="space-y-4">
-          {matches.map(match => (
-            <BetCard
-              key={match.id}
-              match={match}
-              selectedOption={bets.find(b => b.matchId === match.id)?.choice || BetOption.NONE}
-              onSelect={(choice) => handleSelect(match.id, choice)}
-              insight={insights.find(i => 
-                i.matchId.toLowerCase().includes(match.homeTeam.toLowerCase()) || 
-                match.homeTeam.toLowerCase().includes(i.matchId.toLowerCase())
-              )}
-            />
-          ))}
-        </div>
-
-        {/* Footer Banner */}
-        <div className="mt-12 p-8 bg-emerald-900/40 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-emerald-800">
-          <div className="text-center md:text-left">
-            <p className="text-2xl font-black font-oswald uppercase tracking-tight text-white italic">APOSTE, TORÇA E GANHE!!!</p>
-            <p className="text-emerald-300 mt-2">Os melhores jogos da rodada estão aqui.</p>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="p-3 bg-white rounded-xl shadow-lg">
+      <div className="w-full max-w-5xl bg-neutral-900/90 shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row border border-emerald-500/30 backdrop-blur-md">
+        
+        {/* Left Panel - Dark Luxury Branding with Attached Logo */}
+        <div className="md:w-2/5 bg-gradient-to-b from-neutral-950 via-neutral-900 to-black text-white p-6 md:p-8 flex flex-col items-center justify-between text-center relative overflow-hidden border-b md:border-b-0 md:border-r border-emerald-500/20">
+          <div className="relative z-10 w-full flex flex-col items-center">
+            
+            {/* Official D'Grau Logo */}
+            <div className="relative mb-6 group">
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 opacity-60 blur-md group-hover:opacity-100 transition duration-500"></div>
               <img 
-                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=RodadaDGrau&color=064e3b" 
-                alt="QR Code" 
-                className="w-24 h-24"
+                src={logoImg} 
+                alt="D'GRAU APOSTAS - SUBA O NÍVEL DO SEU JOGO" 
+                className="relative w-48 h-48 md:w-56 md:h-56 object-contain rounded-2xl border border-emerald-500/50 shadow-2xl bg-black"
+                referrerPolicy="no-referrer"
               />
             </div>
-            <p className="text-[10px] uppercase font-bold text-emerald-500">BAIXE NOSSO APP</p>
+
+            <h1 className="text-4xl md:text-5xl font-display uppercase leading-tight tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-white to-emerald-300 drop-shadow-[0_2px_10px_rgba(34,197,94,0.3)]">
+              RODADA D'GRAU
+            </h1>
+
+            <p className="text-xs font-semibold tracking-widest text-emerald-400 uppercase mb-4 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" /> SUBA O NÍVEL DO SEU JOGO <Sparkles className="w-3.5 h-3.5" />
+            </p>
+
+            {/* Prominent App Download Button inside left panel */}
+            <button
+              onClick={() => setIsDownloadModalOpen(true)}
+              className="w-full py-2.5 px-4 mb-3 bg-neutral-900/90 hover:bg-emerald-950/80 text-emerald-400 hover:text-emerald-300 border border-emerald-500/50 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md group cursor-pointer"
+            >
+              <Download className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>Instalar App no Celular (Android / iOS)</span>
+            </button>
+
+            <div className="bg-neutral-900/80 border border-emerald-500/30 rounded-2xl p-4 w-full my-3 backdrop-blur shadow-inner">
+              <h2 className="text-2xl font-display uppercase tracking-wide text-white mb-1">
+                DIA DE JOGO É
+              </h2>
+              <h2 className="text-3xl font-display uppercase tracking-wide text-emerald-400 font-extrabold drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]">
+                DIA DE GANHAR
+              </h2>
+            </div>
+
+            <p className="text-lg font-bold italic text-neutral-300 mt-2 mb-4 tracking-wide">
+              APOSTE, TORÇA E GANHE!!!
+            </p>
+          </div>
+
+          <div className="relative z-10 mt-auto pt-6 border-t border-emerald-500/20 w-full bg-neutral-950/60 rounded-xl p-3 border border-emerald-500/30 glow-green-sm">
+            <p className="text-2xl md:text-3xl font-display uppercase tracking-wider text-emerald-400 font-extrabold">
+              SOMENTE R$ 2,00
+            </p>
+          </div>
+
+          {/* Decorative glowing background effects */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+            <div className="absolute top-[-20%] right-[-20%] w-72 h-72 bg-emerald-500 rounded-full blur-[100px]"></div>
+            <div className="absolute bottom-[-20%] left-[-20%] w-72 h-72 bg-emerald-600 rounded-full blur-[100px]"></div>
           </div>
         </div>
-      </main>
 
-      {/* Admin/Manual Entry Modal */}
-      {showAdminModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
-          {!isAdminMode ? (
-            <div className="bg-emerald-900 border-2 border-lime-400 rounded-3xl p-8 max-w-sm w-full shadow-2xl">
-              <h3 className="text-xl font-black font-oswald text-white mb-6 uppercase text-center italic">ACESSO ADMINISTRATIVO</h3>
-              <input 
-                type="password"
-                placeholder="Senha de acesso"
-                className="w-full p-4 bg-emerald-950 border border-emerald-700 rounded-xl text-white mb-4 text-center focus:border-lime-400 outline-none"
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAdminCheck()}
-              />
-              <div className="flex flex-col gap-2">
-                <button 
-                  onClick={handleAdminCheck}
-                  className="w-full bg-lime-400 text-emerald-950 py-3 rounded-xl font-black uppercase hover:bg-lime-300 transition-all"
-                >
-                  Entrar
-                </button>
-                <button 
-                  onClick={() => setShowAdminModal(false)}
-                  className="text-emerald-400 text-sm py-2 hover:text-white"
-                >
-                  Cancelar
-                </button>
+        {/* Right Panel - Game Grid */}
+        <div className="md:w-3/5 bg-bokeh p-6 md:p-8 flex flex-col justify-between">
+          <div>
+            <div className="text-center mb-6">
+              <div className="flex justify-center items-center gap-2 mb-3">
+                <div className="bg-emerald-950 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+                  Próxima Rodada - 12 Jogos
+                </div>
+                <div className="bg-emerald-600 text-black text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
+                  {currentDate}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="bg-emerald-900 border-2 border-lime-400 rounded-3xl p-6 max-w-2xl w-full shadow-2xl my-8">
-              <h3 className="text-2xl font-black font-oswald text-white mb-6 uppercase italic text-center">EDITAR RODADA</h3>
               
-              <div className="mb-6">
-                <label className="block text-[10px] text-emerald-400 uppercase font-bold mb-2">Título da Rodada / Data</label>
-                <input 
+              <h3 className="text-3xl md:text-4xl font-display uppercase text-white mb-1 tracking-tight drop-shadow-sm">
+                A CADA RODADA UMA NOVA EMOÇÃO
+              </h3>
+              
+              <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-4">
+                ESCOLHA: CASA / EMPATE / FORA • TORÇA E COMEMORE A CADA ACERTO
+              </p>
+
+              <div className="max-w-xs mx-auto mb-2">
+                <input
                   type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full p-4 bg-emerald-950 border border-emerald-700 rounded-xl text-white font-bold focus:border-lime-400 outline-none"
-                  placeholder="Ex: Rodada de Domingo - 15/10"
+                  placeholder="NOME DO CLIENTE"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value.toUpperCase())}
+                  className="w-full bg-neutral-900/90 border-2 border-emerald-500/40 focus:border-emerald-400 rounded-xl px-4 py-2 text-center font-bold text-emerald-300 placeholder:text-neutral-500 outline-none transition-all shadow-inner uppercase tracking-wider"
                 />
               </div>
+            </div>
 
-              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 mb-6 custom-scrollbar">
-                {editMatches.map((m, idx) => (
-                  <div key={idx} className="bg-emerald-950 p-4 rounded-xl border border-emerald-800 space-y-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <label className="text-[9px] uppercase font-bold text-emerald-600 ml-1">Mandante</label>
-                        <input 
-                          type="text" value={m.homeTeam} 
-                          onChange={(e) => handleUpdateMatch(idx, 'homeTeam', e.target.value)}
-                          className="w-full p-2 bg-emerald-900 border border-emerald-700 rounded-lg text-white text-sm"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-[9px] uppercase font-bold text-emerald-600 ml-1">Visitante</label>
-                        <input 
-                          type="text" value={m.awayTeam} 
-                          onChange={(e) => handleUpdateMatch(idx, 'awayTeam', e.target.value)}
-                          className="w-full p-2 bg-emerald-900 border border-emerald-700 rounded-lg text-white text-sm"
-                        />
-                      </div>
+            {/* Prize Table */}
+            <div className="flex justify-center mb-5">
+              <div className="bg-gradient-to-r from-neutral-900 via-neutral-900 to-neutral-950 p-4 rounded-2xl border border-emerald-500/50 shadow-lg text-center min-w-[240px] glow-green-sm">
+                <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Prêmio Máximo</p>
+                <p className="text-2xl font-display text-emerald-400 font-black tracking-wide drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">
+                  12 ACERTOS: R$ 1.000,00
+                </p>
+              </div>
+            </div>
+
+            {/* Game Selection Table */}
+            <div className="bg-neutral-900/90 rounded-2xl shadow-2xl border border-emerald-500/30 overflow-hidden mb-5 backdrop-blur-sm">
+              <div className="grid grid-cols-[1.5fr_auto_1fr] bg-gradient-to-r from-neutral-950 to-neutral-900 text-emerald-400 font-bold text-xs py-2.5 px-4 border-b border-emerald-500/20 uppercase tracking-wider">
+                <span>PARTIDA</span>
+                <span className="px-6 text-center">PALPITE</span>
+                <span className="text-right">SELEÇÃO</span>
+              </div>
+              <div className="divide-y divide-neutral-800/80 max-h-[380px] overflow-y-auto custom-scrollbar">
+                {selections.map((selection, idx) => (
+                  <div key={idx} className="grid grid-cols-[1.5fr_auto_1fr] items-center py-2.5 px-4 hover:bg-neutral-800/50 transition-colors">
+                    <div className="flex flex-col pr-2">
+                      <span className="font-semibold text-neutral-200 text-xs md:text-sm leading-tight">{matches[idx]}</span>
                     </div>
-                    <div className="flex gap-2">
-                      <div className="w-24">
-                        <label className="text-[9px] uppercase font-bold text-emerald-600 ml-1">Horário</label>
-                        <input 
-                          type="text" value={m.time} 
-                          onChange={(e) => handleUpdateMatch(idx, 'time', e.target.value)}
-                          className="w-full p-2 bg-emerald-900 border border-emerald-700 rounded-lg text-white text-sm"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-[9px] uppercase font-bold text-emerald-600 ml-1">Liga</label>
-                        <input 
-                          type="text" value={m.league} 
-                          onChange={(e) => handleUpdateMatch(idx, 'league', e.target.value)}
-                          className="w-full p-2 bg-emerald-900 border border-emerald-700 rounded-lg text-white text-sm"
-                        />
-                      </div>
+                    <div className="flex gap-1.5 justify-center">
+                      {(['C', 'E', 'F'] as Selection[]).map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => handleSelect(idx, type)}
+                          className={`w-9 h-9 md:w-10 md:h-10 rounded-lg font-display text-lg flex items-center justify-center transition-all transform active:scale-95 border ${
+                            selection === type
+                              ? 'bg-emerald-500 text-black border-emerald-300 font-extrabold shadow-[0_0_12px_rgba(34,197,94,0.6)] scale-105'
+                              : 'bg-neutral-800 text-neutral-400 border-neutral-700 hover:border-emerald-500/50 hover:text-white'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-xs md:text-sm font-bold ${selection ? 'text-emerald-400' : 'text-neutral-600'}`}>
+                        {selection ? (selection === 'C' ? 'CASA' : selection === 'E' ? 'EMPATE' : 'FORA') : '---'}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => setIsAdminMode(false)}
-                  className="bg-emerald-800 text-emerald-300 py-3 rounded-xl font-bold uppercase hover:text-white transition-all"
-                >
-                  Voltar
-                </button>
-                <button 
-                  onClick={saveManualRound}
-                  className="bg-lime-400 text-emerald-950 py-3 rounded-xl font-black uppercase hover:bg-lime-300 transition-all shadow-lg"
-                >
-                  Salvar Rodada
-                </button>
+          {/* Footer Actions */}
+          <div className="space-y-3.5 mt-2">
+            <div className="flex items-center justify-between bg-neutral-900/90 p-3.5 rounded-2xl border border-emerald-500/30 shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-950 border border-emerald-500/40 rounded-xl text-emerald-400 shadow-sm">
+                  <Bike className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Sorteio da Moto</p>
+                  <p className="text-lg md:text-xl font-display tracking-widest text-emerald-400 font-black">{ticketCode}</p>
+                </div>
               </div>
+              <button 
+                onClick={generateNewCode}
+                className="text-xs font-bold text-emerald-400/80 hover:text-emerald-300 underline uppercase tracking-wider transition-colors"
+              >
+                Novo Código
+              </button>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Sticky Bottom Summary */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-emerald-950/95 backdrop-blur-md border-t border-emerald-800 p-4 z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex flex-col">
-            <span className="text-[10px] text-emerald-400 uppercase font-bold tracking-wider">Palpites</span>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black text-white">{bets.length}</span>
-              <span className="text-emerald-500 font-medium">jogos</span>
-            </div>
+            <button
+              onClick={sendToWhatsApp}
+              disabled={!isComplete}
+              className={`w-full py-3.5 md:py-4 rounded-2xl font-display text-xl md:text-2xl uppercase flex items-center justify-center gap-3 transition-all shadow-xl tracking-wider ${
+                isComplete 
+                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-black font-extrabold hover:from-emerald-400 hover:to-emerald-500 active:scale-[0.99] glow-green cursor-pointer' 
+                  : 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed opacity-70'
+              }`}
+            >
+              <Send className="w-5 h-5 md:w-6 md:h-6" />
+              Validar no WhatsApp
+            </button>
           </div>
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] text-emerald-400 uppercase font-bold tracking-wider">Total</span>
-            <span className="text-2xl font-black text-white tracking-tight">{totalCostStr}</span>
-          </div>
-          <button
-            onClick={handleSubmit}
-            className={`
-              px-8 py-3 rounded-xl font-black text-lg transition-all
-              ${bets.length >= 3 
-                ? 'bg-lime-400 text-emerald-950 hover:bg-lime-300 hover:scale-105 active:scale-95 shadow-lg shadow-lime-400/20' 
-                : 'bg-emerald-900 text-emerald-700 cursor-not-allowed'}
-            `}
+        </div>
+      </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
           >
-            FECHAR PALPITE
-          </button>
-        </div>
-      </footer>
-
-      {/* PIX MODAL */}
-      {showPixModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-emerald-900 border-2 border-lime-400 rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-lime-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-money-bill-transfer text-emerald-900 text-2xl"></i>
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="bg-neutral-900 border border-emerald-500/50 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl glow-green-lg"
+            >
+              <div className="w-20 h-20 bg-emerald-950 text-emerald-400 border border-emerald-500/50 rounded-full flex items-center justify-center mx-auto mb-6 glow-green-sm">
+                <Trophy className="w-10 h-10" />
               </div>
-              <h3 className="text-3xl font-black font-oswald text-white uppercase italic">PAGAMENTO VIA PIX</h3>
-              <p className="text-emerald-300 font-bold mt-2">Valor Total: {totalCostStr}</p>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl mb-6 flex justify-center shadow-inner">
-              <img 
-                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PIX_98984595785&color=064e3b" 
-                alt="PIX QR Code" 
-                className="w-48 h-48"
-              />
-            </div>
-
-            <div className="space-y-3 mb-8">
-              <div className="bg-emerald-950/50 p-3 rounded-lg border border-emerald-800 text-center">
-                <p className="text-[10px] text-emerald-500 uppercase font-black mb-1">Chave PIX (Celular)</p>
-                <p className="text-xl font-bold text-white tracking-widest">98984595785</p>
-              </div>
-              <p className="text-xs text-center text-emerald-400 italic">
-                Pague e envie o comprovante no botão abaixo para registrar seus palpites.
+              <h4 className="text-3xl font-display uppercase mb-2 text-white">Bilhete Enviado!</h4>
+              <p className="text-neutral-300 text-sm mb-6 leading-relaxed">
+                Seus palpites foram enviados para validação no WhatsApp. Boa sorte no sorteio da moto!
               </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleWhatsApp}
-                className="bg-lime-400 text-emerald-950 w-full py-4 rounded-xl font-black text-lg hover:bg-lime-300 transition-colors flex items-center justify-center gap-3 shadow-lg shadow-lime-400/20"
+              <button 
+                onClick={() => {
+                  setShowSuccess(false);
+                  setSelections(new Array(12).fill(null));
+                  generateNewCode();
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-black font-extrabold rounded-xl uppercase tracking-wider hover:from-emerald-400 hover:to-emerald-500 transition-all shadow-lg glow-green-sm"
               >
-                <i className="fab fa-whatsapp text-2xl"></i>
-                ENVIAR COMPROVANTE
+                Novo Bilhete
               </button>
-              <button
-                onClick={() => setShowPixModal(false)}
-                className="text-emerald-400 font-bold py-2 text-sm hover:text-white transition-colors"
-              >
-                VOLTAR PARA APOSTA
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Download App Modal */}
+      <DownloadAppModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        deferredPrompt={deferredPrompt}
+        onInstallPwa={handleInstallPwa}
+      />
     </div>
   );
-};
-
-export default App;
+}
