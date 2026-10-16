@@ -7,7 +7,7 @@ import { DownloadAppModal } from './components/DownloadAppModal';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Flamengo x Fluminense",
+  "mingau x florminenC",
   "Palmeiras x São Paulo",
   "Corinthians x Santos",
   "Grêmio x Internacional",
