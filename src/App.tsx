@@ -6,7 +6,7 @@ import logoImg from './assets/images/dgrau_logo_1785466160845.jpg';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Flamengo x Fluminense",
+  "mingau x florminenC",
   "Palmeiras x São Paulo",
   "Corinthians x Santos",
   "Grêmio x Internacional",
