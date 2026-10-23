@@ -7,7 +7,7 @@ type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
   "Flamengo x Fluminense",
-  "verdão x bambis",
+  "Palmeiras x bambis",
   "Corinthians x Santos",
   "Grêmio x Internacional",
   "Atlético-MG x Cruzeiro",
