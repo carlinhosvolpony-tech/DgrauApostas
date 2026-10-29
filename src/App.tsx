@@ -6,11 +6,11 @@ import logoImg from './assets/images/dgrau_logo_1785466160845.jpg';
 type Selection = 'C' | 'E' | 'F' | null;
 
 const INITIAL_MATCHES = [
-  "Flamengo x Fluminense",
-  "Palmeiras x São Paulo",
-  "Corinthians x Santos",
-  "Grêmio x Internacional",
-  "Atlético-MG x Cruzeiro",
+  "Vasco x Vasco",
+  "Palmeiras x Palmeiras
+  "Corinthians x Corinthians",
+  "Grêmio x Gremio",
+  "Cruzeiro x Cruzeiro",
   "Real Madrid x Barcelona",
   "Man City x Liverpool",
   "Bayern x Dortmund",
